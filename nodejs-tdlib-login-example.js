@@ -103,25 +103,25 @@ function startUserClient(user_id){ // user_id is user that start api bot
     if(u['_']=='updateAuthorizationState'){
       if(u.authorization_state['_'] == 'authorizationStateWaitPhoneNumber'){
         myLog('####### my authorizationStateWaitPhoneNumber');
-        auth1state = 'waitPhoneNumber';
+        auth1state = 'waitPhoneNumber, plz send phone number like this:\n/send c+123456789012\n(char 'c' need!)';
         getAuthFromUser(auth1state,user_id);
         return;
       }
       else if(u.authorization_state['_'] == 'authorizationStateWaitCode'){
         myLog('####### my authorizationStateWaitPhoneNumber');
-        auth1state = 'waitAuthCode';
+        auth1state = 'waitAuthCode, plz send code like this:\n/send c12345\n(char 'c' need!)\n(if send code without a char with telegram the code has expired!)';
         getAuthFromUser(auth1state,user_id);
         return;
       }
       else if(u.authorization_state['_'] == 'authorizationStateWaitPassword'){
         myLog('####### my authorizationStateWaitPhoneNumber');
-        auth1state = 'waitAuthPass';
+        auth1state = 'waitAuthPass, plz send password like this:\n/send c12345\n(char 'c' need!)';
         getAuthFromUser(auth1state,user_id);
         return;
       }
       else if(u.authorization_state['_'] == 'authorizationStateReady'){
         myLog('####### my authorizationStateReady %%%%%%%%%% :))))) ');
-        auth1state = 'Ready';
+        auth1state = 'Ready, now you can send ping in private.';
         botSendMessage(auth1state,user_id);
         var objTemp = {
           '_': 'getMe'
