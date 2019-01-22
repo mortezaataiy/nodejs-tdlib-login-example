@@ -1,0 +1,19 @@
+{
+  "name": "nodejs-tdlib-login-example",
+  "version": "1.0.0",
+  "description": "",
+  "private": true,
+  "main": "nodejs-tdlib-login-example.js",
+  "scripts": {
+    "start": "node nodejs-tdlib-login-example.js"
+  },
+  "engines": {
+    "node": ">= 9.0.0"
+  },
+  "dependencies": {
+    "ffi-napi": "^2.4.3",
+    "ref-napi": "^1.4.0",
+    "tdl": "^6.0.0-rc.2",
+    "tdl-tdlib-ffi": "^0.2.0"
+  }
+}
