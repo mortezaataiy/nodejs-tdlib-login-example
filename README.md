@@ -1,5 +1,7 @@
-[TDLib][tdlib-getting-started] (Telegram Database library) authentication example by [tdl](https://github.com/Bannerets/tdl) (Node.js pakage)
-[tdlib-getting-started]: https://core.telegram.org/tdlib/getting-started
+[TDLib](https://core.telegram.org/tdlib/getting-started) (Telegram Database library) authentication example by [tdl](https://github.com/Bannerets/tdl) (Node.js pakage)
+
+The user login data (Phone number and authentication code) send with [Telegram Bot](https://core.telegram.org/bots).
+
 
 ### Table of Contents
 
@@ -26,16 +28,16 @@
 1. Send `/start` in Api bot
 2. The bot want you to send phone number like this:
 `/send c+123456789012`
-> (char 'c' need!)
+> char 'c' need!
 
 3. The bot want you to send code like this:
 `/send c12345`
->(char 'c' need!)
+>char 'c' need!
 (if send code without a char with telegram the code has expired!)
 
 4. The bot want you to send password like this if needed:
 `/send c12345`
->(char 'c' need!)
+>char 'c' need!
 
 5. Now you receive "Ready" and now you can test cli bot with:
 
