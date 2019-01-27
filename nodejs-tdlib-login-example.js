@@ -10,7 +10,7 @@ const { Client } = require('tdl')
 const { TDLib } = require('tdl-tdlib-ffi')
 const {API_ID, API_HASH, BOT_TOKEN} = require('./config.js');
 
-const myDebug = false; // if you want to see logs change this to true
+const myDebug = true; // if you want to see logs change this to true
 const showSommeryLogs = true;
 function myLog(msg,msg2){
   if(myDebug)
@@ -103,26 +103,30 @@ function startUserClient(user_id){ // user_id is user that start api bot
     if(u['_']=='updateAuthorizationState'){
       if(u.authorization_state['_'] == 'authorizationStateWaitPhoneNumber'){
         myLog('####### my authorizationStateWaitPhoneNumber');
-        auth1state = 'waitPhoneNumber, plz send phone number like this:\n/send c+123456789012\n(char 'c' need!)';
-        getAuthFromUser(auth1state,user_id);
+        auth1state = "waitPhoneNumber";
+        var txt = "plz send phone number like this:\n/send c+123456789012\n(char 'c' need!)";
+        getAuthFromUser(auth1state, txt, user_id);
         return;
       }
       else if(u.authorization_state['_'] == 'authorizationStateWaitCode'){
         myLog('####### my authorizationStateWaitPhoneNumber');
-        auth1state = 'waitAuthCode, plz send code like this:\n/send c12345\n(char 'c' need!)\n(if send code without a char with telegram the code has expired!)';
-        getAuthFromUser(auth1state,user_id);
+        auth1state = "waitAuthCode";
+        var txt = "plz send code like this:\n/send c12345\n(char 'c' need!)\n(if send code without a char with telegram the code has expired!)";
+        getAuthFromUser(auth1state, txt, user_id);
         return;
       }
       else if(u.authorization_state['_'] == 'authorizationStateWaitPassword'){
         myLog('####### my authorizationStateWaitPhoneNumber');
-        auth1state = 'waitAuthPass, plz send password like this:\n/send c12345\n(char 'c' need!)';
-        getAuthFromUser(auth1state,user_id);
+        auth1state = "waitAuthPass";
+        var txt = "plz send password like this:\n/send c12345\n(char 'c' need!)";
+        getAuthFromUser(auth1state, txt, user_id);
         return;
       }
       else if(u.authorization_state['_'] == 'authorizationStateReady'){
         myLog('####### my authorizationStateReady %%%%%%%%%% :))))) ');
-        auth1state = 'Ready, now you can send ping in private.';
-        botSendMessage(auth1state,user_id);
+        auth1state = "Ready";
+        var txt = "now you can send ping in private.";
+        botSendMessage(auth1state + ", " + txt,user_id);
         var objTemp = {
           '_': 'getMe'
         };
@@ -191,8 +195,8 @@ function UserClientSendMessage(text,user_id){
   })
 }
 // send what auth need from api bot to user
-function getAuthFromUser(auth1state, user_id){
-    botSendMessage(auth1state, user_id);
+function getAuthFromUser(auth1state, txt, user_id){
+    botSendMessage(auth1state + ", " + txt, user_id);
 }
 // proccess recived auth data from api bot
 function recivedAuthFromUser(input){
@@ -215,7 +219,7 @@ function recivedAuthFromUser(input){
 
     }
     var objTemp = {
-      _: type
+      "_": type
     };
     objTemp[dataType]= input;
     UserClientInvode(objTemp);
