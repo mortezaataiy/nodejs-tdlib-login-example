@@ -10,24 +10,30 @@ const { Client } = require('tdl')
 const { TDLib } = require('tdl-tdlib-ffi')
 const {API_ID, API_HASH, BOT_TOKEN} = require('./config.js');
 
-const myDebug = true; // if you want to see logs change this to true
+const myDebug = false; // if you want to see logs change this to true
 const showSommeryLogs = true;
 function myLog(msg,msg2){
-  if(myDebug)
+  if(myDebug){
+    console.log('-----------------');
     console.log(msg,msg2);
+  }
 }
 function sommeryLogs(msg,msg2){
-  if(showSommeryLogs)
+  if(showSommeryLogs){
+    console.log('-----------------');
     console.log(msg,msg2);
+  }
 }
 function myError(msg,msg2){
-  if(myDebug)
+  if(myDebug){
+    console.log('=================');
     console.error(msg,msg2);
+  }
 }
-var auth1state = null;
-// auth1state = 'waitPhoneNumber'
-// auth1state = 'waitAuthCode'
-// auth1state = 'waitAuthPass'
+var authState = {};
+// authState[user_id] = 'waitPhoneNumber'
+// authState[user_id] = 'waitAuthCode'
+// authState[user_id] = 'waitAuthPass'
 
 const API_BOT_AUTH = {
   type: 'bot',
@@ -44,16 +50,19 @@ const BotClient = new Client(tdlib, {
   databaseDirectory: 'api_bot/_td_database',
   filesDirectory: 'api_bot/_td_files'
 })
+var BotId;
 BotClient.connect()
 BotClient.login(() => API_BOT_AUTH)
 BotClient.on('error', e => myError('Bot error', e))
 BotClient.on('update', u => {
   if(u['_'] == 'updateNewMessage'
                 && u.message
+                && u.message.sender_user_id != BotId
                 && u.message.content
                 && u.message.content.text
                 && u.message.content.text.text){
     var txt = u.message.content.text.text;
+    var user_id = u.message.sender_user_id;
     sommeryLogs('recived from api bot:',txt)
     if(txt == '/start'){
       if(!UserClientstarted){
@@ -64,8 +73,16 @@ BotClient.on('update', u => {
     }
     if(txt && txt.indexOf('/send')>=0){
       txt = txt.split(' c')[1];
-      recivedAuthFromUser(txt)
+      recivedAuthFromUser(txt, user_id);
     }
+  }
+  else if(u['_'] == 'updateOption'
+                && u.name == 'my_id'
+                && u.value
+                && u.value['_'] == 'optionValueInteger'
+                && u.value.value){
+    BotId = u.value.value;
+    myLog('BotId', BotId);
   }
   //else
   myLog('Bot update', u)
@@ -85,6 +102,10 @@ function botSendMessage(text,user_id) {
             clear_draft: false
           }
         })
+        .then(o => {
+          myLog('From then:', o);
+        })
+        .catch(e => myError(e));
 }
 
 // UserClient:
@@ -102,31 +123,31 @@ function startUserClient(user_id){ // user_id is user that start api bot
   UserClient.on('update', u => {
     if(u['_']=='updateAuthorizationState'){
       if(u.authorization_state['_'] == 'authorizationStateWaitPhoneNumber'){
-        myLog('####### my authorizationStateWaitPhoneNumber');
-        auth1state = "waitPhoneNumber";
+        myLog('####### my waitPhoneNumber', user_id);
+        authState[user_id] = "waitPhoneNumber";
         var txt = "plz send phone number like this:\n/send c+123456789012\n(char 'c' need!)";
-        getAuthFromUser(auth1state, txt, user_id);
+        getAuthFromUser(authState[user_id], txt, user_id);
         return;
       }
       else if(u.authorization_state['_'] == 'authorizationStateWaitCode'){
-        myLog('####### my authorizationStateWaitPhoneNumber');
-        auth1state = "waitAuthCode";
+        myLog('####### my waitAuthCode', user_id);
+        authState[user_id] = "waitAuthCode";
         var txt = "plz send code like this:\n/send c12345\n(char 'c' need!)\n(if send code without a char with telegram the code has expired!)";
-        getAuthFromUser(auth1state, txt, user_id);
+        getAuthFromUser(authState[user_id], txt, user_id);
         return;
       }
       else if(u.authorization_state['_'] == 'authorizationStateWaitPassword'){
-        myLog('####### my authorizationStateWaitPhoneNumber');
-        auth1state = "waitAuthPass";
+        myLog('####### my waitAuthPass', user_id);
+        authState[user_id] = "waitAuthPass";
         var txt = "plz send password like this:\n/send c12345\n(char 'c' need!)";
-        getAuthFromUser(auth1state, txt, user_id);
+        getAuthFromUser(authState[user_id], txt, user_id);
         return;
       }
       else if(u.authorization_state['_'] == 'authorizationStateReady'){
         myLog('####### my authorizationStateReady %%%%%%%%%% :))))) ');
-        auth1state = "Ready";
+        authState[user_id] = "Ready";
         var txt = "now you can send ping in private.";
-        botSendMessage(auth1state + ", " + txt,user_id);
+        botSendMessage(authState[user_id] + ", " + txt,user_id);
         var objTemp = {
           '_': 'getMe'
         };
@@ -136,6 +157,7 @@ function startUserClient(user_id){ // user_id is user that start api bot
           myLog('####### my GetMe $ output:', result);
           UserId = result.id;
         })
+        .catch(e => myError);
 
         return;
       }
@@ -149,9 +171,8 @@ function startUserClient(user_id){ // user_id is user that start api bot
       && u.message.chat_id == UserId
       && u.message.content
       && u.message.content.text){
-      myLog("#####$$$$$$$$############",u.message.content.text)
       if(u.message.content.text.text){
-
+        UserClientRecivedText(u.message.content.text.text,u.message.chat_id);
       }
     }
     myError('UserClient update', u);
@@ -160,9 +181,18 @@ function startUserClient(user_id){ // user_id is user that start api bot
   UserClient.connect()
   UserClient.login(() => ({ type: 'user' }))
 }
-function UserClientInvode(objTemp){
+function UserClientInvode(objTemp, user_id_debug){
   myLog('#######invoke',objTemp)
   UserClient.invoke(objTemp)
+  .then(o => {
+    myLog('From then:', o);
+  })
+  .catch(e => {
+    if(e.message){
+      botSendMessage(e.message, user_id_debug);
+    }
+    myError(e)
+  });
 }
 function UserClientAsyncInvode(objTemp){
   return new Promise(function(res,rej){
@@ -174,7 +204,7 @@ function UserClientAsyncInvode(objTemp){
   })
 }
 function UserClientRecivedText(text,user_id){
-  sommeryLogs('recived text with UserClient:', text)
+  sommeryLogs('recived text from UserClient:', text)
   if(text.toUpperCase() == 'PING' && user_id == UserId)
     UserClientSendMessage('Pong',UserId);
 }
@@ -193,16 +223,25 @@ function UserClientSendMessage(text,user_id){
       }
     }
   })
+  .then(o => {
+    myLog('From then:', o);
+  })
+  .catch(e => {
+    if(e.message){
+      botSendMessage(e.message, user_id);
+    }
+    myError(e)
+  });
 }
 // send what auth need from api bot to user
-function getAuthFromUser(auth1state, txt, user_id){
-    botSendMessage(auth1state + ", " + txt, user_id);
+function getAuthFromUser(thisAuthState, txt, user_id){
+    botSendMessage(thisAuthState + ", " + txt, user_id);
 }
 // proccess recived auth data from api bot
-function recivedAuthFromUser(input){
+function recivedAuthFromUser(input,user_id){
     var type = '';
     var dataType = '';
-    switch (auth1state) {
+    switch (authState[user_id]) {
       case 'waitPhoneNumber':
         type = 'setAuthenticationPhoneNumber';
         dataType = 'phone_number';
@@ -215,13 +254,18 @@ function recivedAuthFromUser(input){
         type = 'checkAuthenticationPassword';
         dataType = 'password';
         break;
-      default:
-
     }
-    var objTemp = {
-      "_": type
-    };
-    objTemp[dataType]= input;
-    UserClientInvode(objTemp);
-
+    if(type && input && dataType){
+      var objTemp = {
+        "_": type
+      };
+      objTemp[dataType]= input;
+      UserClientInvode(objTemp, user_id);
+    }
+    else{
+      myError('type or input or dataType is empty, type:', type);
+      myError('input', input);
+      myError('dataType', dataType);
+      myError('user_id', user_id);
+    }
 }
