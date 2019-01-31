@@ -59,3 +59,13 @@ typings/
 
 # next.js build output
 .next
+
+# config file
+config.js
+
+# tdlib directories
+user/
+api_bot/
+
+# ForNeVeR/tdlib.native's dll's
+*.dll
