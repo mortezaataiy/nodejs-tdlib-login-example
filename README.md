@@ -2,7 +2,7 @@
 
 The user login data (Phone number and authentication code) send with [Telegram Bot](https://core.telegram.org/bots).
 
-![TDLib nodejs authentication example](https://raw.githubusercontent.com/mortezaataiy/nodejs-tdlib-login-example/first-push/output.gif)
+![TDLib nodejs authentication example](https://raw.githubusercontent.com/mortezaataiy/nodejs-tdlib-login-example/master/output.gif)
 
 ### Table of Contents
 
