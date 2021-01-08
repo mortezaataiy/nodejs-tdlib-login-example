@@ -1,6 +1,8 @@
-[TDLib](https://core.telegram.org/tdlib/getting-started) (Telegram Database library) authentication example by [tdl](https://github.com/Bannerets/tdl) (Node.js pakage)
+A simple example of [TDLib](https://core.telegram.org/tdlib/getting-started) (Telegram Database Library) authentication using [tdl](https://github.com/Bannerets/tdl) (Node.js package)
 
-The user login data (Phone number and authentication code) send with [Telegram Bot](https://core.telegram.org/bots).
+User login information (phone number and authentication code) is sent by [Telegram API Bot](https://core.telegram.org/bots).
+
+After successfully logging in, if you send "Ping" in your private chat, you will see that "Pong" will be sent automatically
 
 ![TDLib nodejs authentication example](https://raw.githubusercontent.com/mortezaataiy/nodejs-tdlib-login-example/master/output.gif)
 
@@ -26,17 +28,17 @@ The user login data (Phone number and authentication code) send with [Telegram B
 <a name="test"></a>
 ### Test
 
-1. Send `/start` in Api bot
+1. Send `/start` in your Api bot (that you set token in config file)
 2. The bot want you to send phone number like this:
 `/send c+123456789012`
 > char 'c' need!
 
-3. The bot want you to send code like this:
+3. The bot want you to send auth code like this: (The code that Telegram sent you to log in)
 `/send c12345`
 >char 'c' need!
 (if send code without a char with telegram the code has expired!)
 
-4. The bot want you to send password like this if needed:
+4. The bot want you to send password like this if needed: (If Two-Step Verification is actived)
 `/send c12345`
 >char 'c' need!
 
@@ -44,4 +46,7 @@ The user login data (Phone number and authentication code) send with [Telegram B
 
 6. Send `Ping` in private(saved messages) in your telegram account
 
-7. now you see send automatic "Pong" after "ping" :)
+7. you will see that "Pong" will be sent automatically :)
+
+
+### If you have a problem, send an issue
