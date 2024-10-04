@@ -7,6 +7,8 @@
 */
 
 const { Client } = require('tdl')
+const { getTdjson } = require('prebuilt-tdlib')
+
 const { TDLib } = require('tdl-tdlib-ffi')
 const {API_ID, API_HASH, BOT_TOKEN} = require('./config.js');
 
@@ -116,6 +118,7 @@ const UserClient = new Client(tdlib, {
   apiHash: API_HASH,
   databaseDirectory: 'user/_td_database',
   filesDirectory: 'user/_td_files',
+  tdjson: getTdjson()
 })
 function startUserClient(user_id){ // user_id is user that start api bot
   sommeryLogs('UserClient start');
